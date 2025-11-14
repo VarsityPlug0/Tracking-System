@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Package Tracking</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4ade80;
+            --warning: #facc15;
+            --danger: #f87171;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Video Background */
+        #videoBackground {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+            opacity: 0.7;
+        }
+
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 40px;
+            text-align: center;
+            z-index: 1;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--gray);
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .tracking-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .input-group {
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .track-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-top: 10px;
+        }
+
+        .track-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(67, 97, 238, 0.3);
+        }
+
+        .track-btn:active {
+            transform: translateY(0);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            display: none;
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin: 20px 0;
+            border: 1px solid #fcc;
+        }
+
+        .tracking-results {
+            display: none;
+            text-align: left;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid var(--light-gray);
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .tracking-number {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .status-delivered {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-in-transit {
+            background: #fff8e1;
+            color: #f57f17;
+        }
+
+        .status-pending {
+            background: #eceff1;
+            color: #546e7a;
+        }
+
+        .package-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .info-card {
+            background: var(--light);
+            padding: 15px;
+            border-radius: var(--border-radius);
+        }
+
+        .info-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .events-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .events-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .event-item {
+            border-left: 3px solid var(--primary);
+            padding-left: 15px;
+        }
+
+        .event-date {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .event-location {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .event-description {
+            margin-top: 5px;
+            color: var(--dark);
+        }
+
+        .back-btn {
+            background: var(--light);
+            color: var(--dark);
+            border: none;
+            padding: 12px 20px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--light-gray);
+        }
+
+        footer {
+            margin-top: 30px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+            
+            .package-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Video Background -->
+    <video id="videoBackground" autoplay muted loop>
+        <source src="Logo.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <div class="video-overlay"></div>
+
+    <div class="container">
+        <div class="logo">
+            <i class="fas fa-shipping-fast"></i>
+            <span>CourierIt</span>
+        </div>
+        <p class="subtitle">Track your packages in real-time</p>
+        
+        <form class="tracking-form" id="trackingForm">
+            <div class="input-group">
+                <label for="trackingNumber">Tracking Number</label>
+                <input 
+                    type="text" 
+                    id="trackingNumber" 
+                    name="trackingNumber" 
+                    placeholder="Enter your tracking number" 
+                    required
+                >
+            </div>
+            <button type="submit" class="track-btn">
+                <i class="fas fa-search"></i> Track Package
+            </button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Tracking your package...</p>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="tracking-results" id="trackingResults">
+            <div class="results-header">
+                <div class="tracking-number" id="resultTrackingNumber"></div>
+                <div class="status-badge" id="statusBadge"></div>
+            </div>
+
+            <div class="package-info">
+                <div class="info-card">
+                    <div class="info-label">Client Name</div>
+                    <div class="info-value" id="clientName"></div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">Destination</div>
+                    <div class="info-value" id="destination"></div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">Description</div>
+                    <div class="info-value" id="description"></div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">Status</div>
+                    <div class="info-value" id="status"></div>
+                </div>
+            </div>
+
+            <h3 class="events-title">Tracking Events</h3>
+            <div class="events-list" id="eventsList"></div>
+
+            <button class="back-btn" id="backButton">
+                <i class="fas fa-arrow-left"></i> Back to Tracking
+            </button>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 CourierIt Logistics. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        // DOM Elements
+        const trackingForm = document.getElementById('trackingForm');
+        const trackingNumberInput = document.getElementById('trackingNumber');
+        const loading = document.getElementById('loading');
+        const errorMessage = document.getElementById('errorMessage');
+        const trackingResults = document.getElementById('trackingResults');
+        const resultTrackingNumber = document.getElementById('resultTrackingNumber');
+        const statusBadge = document.getElementById('statusBadge');
+        const clientName = document.getElementById('clientName');
+        const destination = document.getElementById('destination');
+        const description = document.getElementById('description');
+        const status = document.getElementById('status');
+        const eventsList = document.getElementById('eventsList');
+        const backButton = document.getElementById('backButton');
+
+        // Function to show error message
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            loading.style.display = 'none';
+            trackingResults.style.display = 'none';
+        }
+
+        // Function to display tracking results
+        function displayTrackingResults(data) {
+            resultTrackingNumber.textContent = `Tracking #: ${data.trackingNumber}`;
+            clientName.textContent = data.clientName;
+            destination.textContent = data.destination;
+            description.textContent = data.description;
+            status.textContent = data.status;
+
+            // Set status badge
+            statusBadge.textContent = data.status;
+            statusBadge.className = 'status-badge';
+            if (data.status === 'Delivered') {
+                statusBadge.classList.add('status-delivered');
+            } else if (data.status === 'In Transit') {
+                statusBadge.classList.add('status-in-transit');
+            } else {
+                statusBadge.classList.add('status-pending');
+            }
+
+            // Display events
+            eventsList.innerHTML = '';
+            data.events.forEach(event => {
+                const eventElement = document.createElement('div');
+                eventElement.className = 'event-item';
+                eventElement.innerHTML = `
+                    <div class="event-date">${event.timestamp}</div>
+                    <div class="event-location">${event.location}</div>
+                    <div class="event-description">${event.description}</div>
+                `;
+                eventsList.appendChild(eventElement);
+            });
+
+            // Show results
+            loading.style.display = 'none';
+            trackingResults.style.display = 'block';
+            errorMessage.style.display = 'none';
+        }
+
+        // Function to track a package
+        function trackPackage(trackingNumber) {
+            // Show loading, hide results and errors
+            loading.style.display = 'block';
+            trackingResults.style.display = 'none';
+            errorMessage.style.display = 'none';
+            
+            // Make API call to track the package
+            fetch('/api/track', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ trackingNumber: trackingNumber })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Hide loading
+                loading.style.display = 'none';
+                
+                if (data.error) {
+                    showError(data.error);
+                } else {
+                    // Display tracking results
+                    displayTrackingResults(data);
+                }
+            })
+            .catch(error => {
+                // Hide loading
+                loading.style.display = 'none';
+                console.error('Error:', error);
+                showError('Failed to track package. Please try again.');
+            });
+        }
+
+        // Event Listeners
+        trackingForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const trackingNumber = trackingNumberInput.value.trim();
+            if (trackingNumber) {
+                trackPackage(trackingNumber);
+            }
+        });
+
+        backButton.addEventListener('click', () => {
+            trackingResults.style.display = 'none';
+            trackingForm.style.display = 'block';
+            trackingNumberInput.value = '';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - CourierIt</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4ade80;
+            --warning: #facc15;
+            --danger: #f87171;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .logo i {
+            background: var(--primary);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--gray);
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 8px 12px;
+            border-radius: 8px;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--primary);
+            background: rgba(67, 97, 238, 0.1);
+        }
+
+        .admin-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+        }
+
+        .admin-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--dark);
+            font-weight: 800;
+        }
+
+        .admin-header p {
+            font-size: 1.2rem;
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-icon {
+            width: 70px;
+            height: 70px;
+            background: rgba(67, 97, 238, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: var(--primary);
+            font-size: 28px;
+        }
+
+        .stat-card h3 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .stat-card p {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+
+        .admin-section {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .section-header h2 {
+            font-size: 1.8rem;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-header h2 i {
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 1.1rem;
+        }
+
+        .form-group p {
+            color: var(--gray);
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.2);
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-success {
+            background: var(--success);
+        }
+
+        .btn-success:hover {
+            background: #22c55e;
+            box-shadow: 0 5px 15px rgba(74, 222, 128, 0.3);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: var(--dark);
+        }
+
+        .btn-warning:hover {
+            background: #eab308;
+            box-shadow: 0 5px 15px rgba(250, 204, 21, 0.3);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: #ef4444;
+            box-shadow: 0 5px 15px rgba(248, 113, 113, 0.3);
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        .btn-info {
+            background: var(--accent);
+        }
+
+        .btn-info:hover {
+            background: #0ea5e9;
+            box-shadow: 0 5px 15px rgba(14, 165, 233, 0.3);
+        }
+
+        .tracking-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .tracking-table th {
+            background: rgba(67, 97, 238, 0.1);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .tracking-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .tracking-table tr:hover {
+            background: rgba(67, 97, 238, 0.03);
+        }
+
+        .status-badge {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-in-transit {
+            background: rgba(76, 201, 240, 0.2);
+            color: #0d94bd;
+        }
+
+        .status-delivered {
+            background: rgba(74, 222, 128, 0.2);
+            color: #16a34a;
+        }
+
+        .status-pending {
+            background: rgba(250, 204, 21, 0.2);
+            color: #ca8a04;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            color: white;
+            font-weight: 600;
+            box-shadow: var(--box-shadow);
+            transform: translateX(200%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: var(--success);
+        }
+
+        .notification.error {
+            background: var(--danger);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .modal-header h2 {
+            font-size: 1.5rem;
+            color: var(--dark);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .modal-footer {
+            padding: 20px 30px;
+            border-top: 1px solid var(--light-gray);
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+
+        .event-item {
+            padding: 15px;
+            border-left: 3px solid var(--primary);
+            background: var(--light);
+            margin-bottom: 15px;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+
+        .event-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .event-timestamp {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .event-location {
+            font-weight: 600;
+        }
+
+        .event-description {
+            color: var(--gray);
+            margin-bottom: 10px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            color: var(--gray);
+            border-top: 1px solid var(--light-gray);
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .dashboard-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-box-open"></i>
+                <span>CourierIt Admin</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#" class="active">Dashboard</a></li>
+                    <li><a href="#">Tracking Numbers</a></li>
+                    <li><a href="#">Orders</a></li>
+                    <li><a href="#">Clients</a></li>
+                    <li><a href="#">Settings</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <section class="admin-header">
+            <h1>Admin Dashboard</h1>
+            <p>Manage tracking numbers, orders, and client information</p>
+        </section>
+
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-barcode"></i>
+                </div>
+                <h3 id="totalTracking">0</h3>
+                <p>Total Tracking Numbers</p>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-truck"></i>
+                </div>
+                <h3 id="activeOrders">0</h3>
+                <p>Active Orders</p>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 id="totalClients">0</h3>
+                <p>Clients</p>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3 id="delivered">0</h3>
+                <p>Delivered Orders</p>
+            </div>
+        </div>
+
+        <div class="admin-section">
+            <div class="section-header">
+                <h2><i class="fas fa-plus-circle"></i> Generate New Tracking Number</h2>
+            </div>
+            
+            <form id="generateTrackingForm">
+                <div class="form-group">
+                    <label for="clientName">Client Name</label>
+                    <input type="text" id="clientName" placeholder="Enter client name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="packageDescription">Package Description</label>
+                    <textarea id="packageDescription" placeholder="Describe the package contents" rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="destination">Destination</label>
+                    <input type="text" id="destination" placeholder="Enter delivery address">
+                </div>
+                
+                <button type="submit" class="btn">
+                    <i class="fas fa-magic"></i>
+                    Generate Tracking Number
+                </button>
+            </form>
+        </div>
+
+        <div class="admin-section">
+            <div class="section-header">
+                <h2><i class="fas fa-list"></i> Recent Tracking Numbers</h2>
+                <button class="btn btn-success" id="refreshBtn">
+                    <i class="fas fa-sync"></i>
+                    Refresh
+                </button>
+            </div>
+            
+            <table class="tracking-table">
+                <thead>
+                    <tr>
+                        <th>Tracking Number</th>
+                        <th>Client</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="trackingTableBody">
+                    <!-- Tracking numbers will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Edit Tracking Modal -->
+        <div class="modal" id="editTrackingModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Edit Tracking Information</h2>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editTrackingNumber">
+                    
+                    <div class="form-group">
+                        <label for="editClientName">Client Name</label>
+                        <input type="text" id="editClientName" placeholder="Enter client name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editDescription">Package Description</label>
+                        <textarea id="editDescription" placeholder="Describe the package contents" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editDestination">Destination</label>
+                        <input type="text" id="editDestination" placeholder="Enter delivery address">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editStatus">Status</label>
+                        <select id="editStatus">
+                            <option value="Pending">Pending</option>
+                            <option value="In Transit">In Transit</option>
+                            <option value="Delivered">Delivered</option>
+                            <option value="Exception">Exception</option>
+                            <option value="Returned">Returned</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Add New Event</label>
+                        <input type="text" id="newEventLocation" placeholder="Location (e.g., Distribution Center - Chicago, IL)">
+                        <textarea id="newEventDescription" placeholder="Event description (e.g., Package arrived at facility)" rows="2" style="margin-top: 10px;"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Tracking History</label>
+                        <div id="trackingEvents">
+                            <!-- Events will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="cancelEditBtn">Cancel</button>
+                    <button class="btn btn-success" id="saveEditBtn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2025 CourierIt Logistics. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const generateForm = document.getElementById('generateTrackingForm');
+            const refreshBtn = document.getElementById('refreshBtn');
+            const trackingTableBody = document.getElementById('trackingTableBody');
+            const notification = document.getElementById('notification');
+            const editModal = document.getElementById('editTrackingModal');
+            const closeModal = document.querySelector('.close-modal');
+            const cancelEditBtn = document.getElementById('cancelEditBtn');
+            const saveEditBtn = document.getElementById('saveEditBtn');
+            
+            // Load tracking numbers on page load
+            loadTrackingNumbers();
+            
+            // Generate tracking number form submission
+            generateForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const clientName = document.getElementById('clientName').value;
+                const packageDescription = document.getElementById('packageDescription').value;
+                const destination = document.getElementById('destination').value;
+                
+                if (clientName.trim() === '') {
+                    showNotification('Please enter a client name', 'error');
+                    return;
+                }
+                
+                // Send request to generate tracking number
+                fetch('/api/generate-tracking', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        clientName,
+                        description: packageDescription,
+                        destination
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showNotification(data.error, 'error');
+                    } else {
+                        showNotification(`Tracking number ${data.trackingNumber} generated for ${data.clientName}`, 'success');
+                        generateForm.reset();
+                        loadTrackingNumbers(); // Refresh the table
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Failed to generate tracking number', 'error');
+                });
+            });
+            
+            // Refresh button
+            refreshBtn.addEventListener('click', function() {
+                loadTrackingNumbers();
+                showNotification('Data refreshed', 'success');
+            });
+            
+            // Close modal events
+            closeModal.addEventListener('click', function() {
+                editModal.style.display = 'none';
+            });
+            
+            cancelEditBtn.addEventListener('click', function() {
+                editModal.style.display = 'none';
+            });
+            
+            window.addEventListener('click', function(event) {
+                if (event.target === editModal) {
+                    editModal.style.display = 'none';
+                }
+            });
+            
+            // Save edit button
+            saveEditBtn.addEventListener('click', function() {
+                saveTrackingChanges();
+            });
+            
+            // Load tracking numbers from API
+            function loadTrackingNumbers() {
+                fetch('/api/tracking-numbers')
+                .then(response => response.json())
+                .then(data => {
+                    renderTrackingNumbers(data);
+                    updateStats(data);
+                })
+                .catch(error => {
+                    console.error('Error loading tracking numbers:', error);
+                    showNotification('Failed to load tracking numbers', 'error');
+                });
+            }
+            
+            // Render tracking numbers in the table
+            function renderTrackingNumbers(trackingNumbers) {
+                trackingTableBody.innerHTML = '';
+                
+                if (trackingNumbers.length === 0) {
+                    trackingTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No tracking numbers found</td></tr>';
+                    return;
+                }
+                
+                trackingNumbers.forEach(tracking => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${tracking.trackingNumber}</td>
+                        <td>${tracking.clientName}</td>
+                        <td>${tracking.description}</td>
+                        <td><span class="status-badge status-${tracking.status.toLowerCase().replace(' ', '-')}">${tracking.status}</span></td>
+                        <td>${tracking.createdAt}</td>
+                        <td class="actions">
+                            <button class="btn btn-sm btn-info view-btn" data-tracking="${tracking.trackingNumber}"><i class="fas fa-edit"></i> Edit</button>
+                            <button class="btn btn-sm btn-danger delete-btn" data-tracking="${tracking.trackingNumber}"><i class="fas fa-trash"></i> Delete</button>
+                        </td>
+                    `;
+                    trackingTableBody.appendChild(row);
+                });
+                
+                // Add event listeners to edit buttons
+                document.querySelectorAll('.view-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const trackingNumber = this.getAttribute('data-tracking');
+                        openEditModal(trackingNumber);
+                    });
+                });
+                
+                // Add event listeners to delete buttons
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const trackingNumber = this.getAttribute('data-tracking');
+                        deleteTrackingNumber(trackingNumber);
+                    });
+                });
+            }
+            
+            // Open edit modal with tracking data
+            function openEditModal(trackingNumber) {
+                // Fetch the tracking data
+                fetch('/api/tracking-numbers')
+                .then(response => response.json())
+                .then(data => {
+                    const tracking = data.find(t => t.trackingNumber === trackingNumber);
+                    if (tracking) {
+                        // Populate the form
+                        document.getElementById('editTrackingNumber').value = tracking.trackingNumber;
+                        document.getElementById('editClientName').value = tracking.clientName;
+                        document.getElementById('editDescription').value = tracking.description;
+                        document.getElementById('editDestination').value = tracking.destination;
+                        document.getElementById('editStatus').value = tracking.status;
+                        
+                        // Populate events
+                        const eventsContainer = document.getElementById('trackingEvents');
+                        eventsContainer.innerHTML = '';
+                        
+                        tracking.events.forEach(event => {
+                            const eventItem = document.createElement('div');
+                            eventItem.className = 'event-item';
+                            eventItem.innerHTML = `
+                                <div class="event-header">
+                                    <div class="event-timestamp">${event.timestamp}</div>
+                                    <div class="event-location">${event.location}</div>
+                                </div>
+                                <div class="event-description">${event.description}</div>
+                            `;
+                            eventsContainer.appendChild(eventItem);
+                        });
+                        
+                        // Show the modal
+                        editModal.style.display = 'flex';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading tracking data:', error);
+                    showNotification('Failed to load tracking data', 'error');
+                });
+            }
+            
+            // Save tracking changes
+            function saveTrackingChanges() {
+                const trackingNumber = document.getElementById('editTrackingNumber').value;
+                const clientName = document.getElementById('editClientName').value;
+                const description = document.getElementById('editDescription').value;
+                const destination = document.getElementById('editDestination').value;
+                const status = document.getElementById('editStatus').value;
+                const newEventLocation = document.getElementById('newEventLocation').value;
+                const newEventDescription = document.getElementById('newEventDescription').value;
+                
+                // Prepare update data
+                const updateData = {
+                    trackingNumber,
+                    clientName,
+                    description,
+                    destination,
+                    status
+                };
+                
+                // Add new event if provided
+                if (newEventLocation.trim() !== '' && newEventDescription.trim() !== '') {
+                    updateData.newEvent = {
+                        location: newEventLocation,
+                        description: newEventDescription
+                    };
+                }
+                
+                // Send update request
+                fetch('/api/update-tracking', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updateData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showNotification(data.error, 'error');
+                    } else {
+                        showNotification('Tracking information updated successfully', 'success');
+                        editModal.style.display = 'none';
+                        loadTrackingNumbers(); // Refresh the table
+                        
+                        // Clear the new event fields
+                        document.getElementById('newEventLocation').value = '';
+                        document.getElementById('newEventDescription').value = '';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Failed to update tracking information', 'error');
+                });
+            }
+            
+            // Delete tracking number
+            function deleteTrackingNumber(trackingNumber) {
+                if (confirm(`Are you sure you want to delete tracking number ${trackingNumber}?`)) {
+                    fetch(`/api/tracking-numbers/${trackingNumber}`, {
+                        method: 'DELETE'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            showNotification(data.error, 'error');
+                        } else {
+                            showNotification(data.message, 'success');
+                            loadTrackingNumbers(); // Refresh the table
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showNotification('Failed to delete tracking number', 'error');
+                    });
+                }
+            }
+            
+            // Update dashboard stats
+            function updateStats(trackingNumbers) {
+                document.getElementById('totalTracking').textContent = trackingNumbers.length;
+                
+                const activeOrders = trackingNumbers.filter(t => t.status !== 'Delivered').length;
+                document.getElementById('activeOrders').textContent = activeOrders;
+                
+                // Get unique clients
+                const clients = [...new Set(trackingNumbers.map(t => t.clientName))];
+                document.getElementById('totalClients').textContent = clients.length;
+                
+                const delivered = trackingNumbers.filter(t => t.status === 'Delivered').length;
+                document.getElementById('delivered').textContent = delivered;
+            }
+            
+            // Show notification function
+            function showNotification(message, type) {
+                notification.textContent = message;
+                notification.className = 'notification ' + type + ' show';
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
